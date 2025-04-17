@@ -1,9 +1,12 @@
 import time
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from finances_statements.logger import logger
 from finances_statements.routes import router
+from finances_statements.db import get_db
 
 app = FastAPI()
 
@@ -53,9 +56,11 @@ app.include_router(router, prefix="/api/v1", tags=["api"])
 
 
 @app.get("/health", tags=["health"])
-def health_check():
+async def health_check(db: AsyncSession = Depends(get_db)):
     """
     Health check endpoint.
     """
 
-    return {"status": "ok"}
+    result = await db.execute(text("SELECT 1"))
+
+    return {"status": "ok", "result": result.scalar()}

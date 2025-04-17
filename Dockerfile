@@ -21,6 +21,6 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-COPY src/finances_file_service ./finances_file_service
+COPY src/finances_statements ./finances_statements
 
-ENTRYPOINT ["fastapi", "run", "finances_file_service/main.py"]
+ENTRYPOINT ["fastapi", "run", "finances_statements/main.py"]
