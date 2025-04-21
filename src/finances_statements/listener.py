@@ -11,10 +11,7 @@ from finances_statements.params import get_rabbitmq_connection
 
 async def on_message(message: aio_pika.IncomingMessage):
     async with message.process():
-        print(f"Received message: {message.body}")
-        payload = json.loads(json.loads(message.body))
-
-        print({"data": payload})
+        payload = json.loads(message.body)
 
         try:
             statement = schemas.StatementCreate(**payload)
