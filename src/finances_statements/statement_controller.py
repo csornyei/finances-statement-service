@@ -17,7 +17,7 @@ async def get_statements(db: AsyncSession, skip: int = 0, limit: int = 100):
 
 
 async def create_statement(db: AsyncSession, statement: StatementCreate):
-    db_statement = Statements(**statement.dict())
+    db_statement = Statements(**statement.model_dump())
     db.add(db_statement)
     await db.commit()
     await db.refresh(db_statement)
