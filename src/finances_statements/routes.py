@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from finances_statements.db import get_db
 from finances_statements import statement_controller, schemas
+from finances_shared.db import get_db
 
 
 router = APIRouter()

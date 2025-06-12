@@ -6,7 +6,8 @@ import aio_pika
 from finances_statements.logger import logger
 from finances_statements.db import get_db
 from finances_statements import statement_controller, schemas
-from finances_statements.params import get_rabbitmq_connection
+from finances_shared.params import RabbitMQParams
+from finances_shared.rabbitmq.listener import RabbitMQListener
 
 
 async def on_message(message: aio_pika.IncomingMessage):
@@ -29,16 +30,13 @@ async def on_message(message: aio_pika.IncomingMessage):
 
 
 async def main():
-    conn_string = get_rabbitmq_connection()
-    connection = await aio_pika.connect_robust(conn_string)
-    channel = await connection.channel()
-    queue = await channel.declare_queue("statement", durable=True)
+    params = RabbitMQParams.from_env(logger)
 
-    logger.info("Connected to RabbitMQ and declared queue")
-    logger.info("Waiting for messages...")
-    await queue.consume(on_message)
+    listener = RabbitMQListener("statement")
 
-    await asyncio.Future()  # Run forever
+    await listener.connect(params=params, logger=logger)
+
+    await listener.listen(on_message, logger)
 
 
 if __name__ == "__main__":

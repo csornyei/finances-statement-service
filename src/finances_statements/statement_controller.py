@@ -2,8 +2,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import update, delete
 from uuid import UUID
-from finances_statements.models import Statements
+
 from finances_statements.schemas import StatementCreate, StatementUpdate
+
+from finances_shared.models.statement import Statements
 
 
 async def get_statement(db: AsyncSession, statement_id: UUID):

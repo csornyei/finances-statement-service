@@ -1,4 +1,5 @@
 import time
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy import text
@@ -6,9 +7,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from finances_statements.logger import logger
 from finances_statements.routes import router
-from finances_statements.db import get_db
+from finances_shared.db import init_db, get_db
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db(logger)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.middleware("http")
