@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
 from finances_statements import statement_controller, schemas
+from finances_statements.logger import logger
 from finances_shared.db import get_db
-
 
 router = APIRouter()
 
@@ -13,18 +13,27 @@ router = APIRouter()
 async def create_statement(
     statement: schemas.StatementCreate, db: AsyncSession = Depends(get_db)
 ):
-    return await statement_controller.create_statement(db, statement)
+    try:
+        created_statement = await statement_controller.create_statement(db, statement)
+
+        return created_statement
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error creating statement: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/statements/", response_model=list[schemas.StatementOut])
-async def read_statements(
-    skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)
+@router.get("/statements/", response_model=list[schemas.StatementWithAccounts])
+async def list_statements(
+    params: schemas.StatementFilters = Depends(), db: AsyncSession = Depends(get_db)
 ):
-    return await statement_controller.get_statements(db, skip=skip, limit=limit)
+    return await statement_controller.get_statements(db, filters=params)
 
 
-@router.get("/statements/{statement_id}", response_model=schemas.StatementOut)
-async def read_statement(statement_id: UUID, db: AsyncSession = Depends(get_db)):
+@router.get("/statements/{statement_id}", response_model=schemas.StatementWithAccounts)
+async def get_one_statement(statement_id: UUID, db: AsyncSession = Depends(get_db)):
     db_statement = await statement_controller.get_statement(db, statement_id)
     if db_statement is None:
         raise HTTPException(status_code=404, detail="Statement not found")
