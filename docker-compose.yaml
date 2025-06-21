@@ -1,32 +1,11 @@
 services:
-  # postgres
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres:/var/lib/postgresql/data
-  
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"       # AMQP protocol port
-      - "15672:15672"     # Management web UI
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: rabbitmq
-
   finances_statements:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - github_user
+        - github_token
     container_name: finances_statements
     restart: always
     ports:
@@ -37,6 +16,44 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASSWORD=rabbitmq
+    secrets:
+      - github_user
+      - github_token
 
-volumes:
-  postgres:
+  statements_listener:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      secrets:
+        - github_user
+        - github_token
+    container_name: statements_listener
+    restart: always
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASSWORD=rabbitmq
+    secrets:
+      - github_user
+      - github_token
+    entrypoint: ["python", "-m", "finances_statements.listener"]
+
+networks:
+  finances-network:
+    external: true
+
+secrets:
+  github_user:
+    file: ./secrets/github_user.txt
+  github_token:
+    file: ./secrets/github_token.txt
