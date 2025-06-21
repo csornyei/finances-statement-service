@@ -1,8 +1,8 @@
 import os
-import httpx
-from pydantic import BaseModel
 
+import httpx
 from finances_shared.models import Account
+from pydantic import BaseModel
 
 ACCOUNTS_URL = os.getenv("ACCOUNTS_URL")
 

@@ -2,12 +2,12 @@ import asyncio
 import json
 
 import aio_pika
-
-from finances_statements.logger import logger
-from finances_statements.db import get_db
-from finances_statements import statement_controller, schemas
+from finances_shared.db import get_db_session, init_db
 from finances_shared.params import RabbitMQParams
 from finances_shared.rabbitmq.listener import RabbitMQListener
+
+from finances_statements import schemas, statement_controller
+from finances_statements.logger import logger
 
 
 async def on_message(message: aio_pika.IncomingMessage):
@@ -20,16 +20,16 @@ async def on_message(message: aio_pika.IncomingMessage):
             logger.error(f"Error parsing message: {e}")
             return
 
-        db_generator = get_db()
-        db = await anext(db_generator)
-        try:
+        async with get_db_session() as db:
             await statement_controller.create_statement(db, statement)
             logger.info(f"Statement created: {statement}")
-        finally:
-            await db_generator.aclose()
 
 
 async def main():
+    init_db(logger)
+
+    logger.info("Starting RabbitMQ listener...")
+
     params = RabbitMQParams.from_env(logger)
 
     listener = RabbitMQListener("statement")

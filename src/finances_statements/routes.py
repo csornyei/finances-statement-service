@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
-from finances_statements import statement_controller, schemas
-from finances_statements.logger import logger
+from fastapi import APIRouter, Depends, HTTPException
 from finances_shared.db import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from finances_statements import schemas, statement_controller
+from finances_statements.logger import logger
 
 router = APIRouter()
 

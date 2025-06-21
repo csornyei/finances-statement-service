@@ -1,20 +1,20 @@
 from typing import Optional
-from sqlalchemy import update, delete
+from uuid import UUID
+
+from finances_shared.models.statement import Statements
+from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload, selectinload
-from uuid import UUID
 
 import finances_statements.services.accounts as accounts_service
 from finances_statements.logger import logger
 from finances_statements.schemas import (
     StatementCreate,
+    StatementFilters,
     StatementUpdate,
     StatementWithAccounts,
-    StatementFilters,
 )
-
-from finances_shared.models.statement import Statements
 
 
 async def get_statement(
