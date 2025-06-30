@@ -10,7 +10,7 @@ dependencies = [
     "pydantic (>=2.11.3,<3.0.0)",
     "asyncpg (>=0.30.0,<0.31.0)",
     "greenlet (>=3.2.0,<4.0.0)",
-    "finances_shared @ git+https://github.com/csornyei/finances_shared.git@0.2.0",
+    "finances_shared @ git+https://github.com/csornyei/finances_shared.git@0.2.1",
     "httpx (>=0.28.1,<0.29.0)",
 ]
 
@@ -21,7 +21,6 @@ packages = [{ include = "finances_statements", from = "src" }]
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 pytest-asyncio = "^0.26.0"
-httpx = "^0.28.1"
 ruff = "^0.11.5"
 black = "^25.1.0"
 isort = "^6.0.1"
