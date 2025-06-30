@@ -26,14 +26,14 @@ async def create_statement(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/statements/", response_model=list[schemas.StatementWithAccounts])
+@router.get("/statements/", response_model=list[schemas.StatementExtended])
 async def list_statements(
     params: schemas.StatementFilters = Depends(), db: AsyncSession = Depends(get_db)
 ):
     return await statement_controller.get_statements(db, filters=params)
 
 
-@router.get("/statements/{statement_id}", response_model=schemas.StatementWithAccounts)
+@router.get("/statements/{statement_id}", response_model=schemas.StatementExtended)
 async def get_one_statement(statement_id: UUID, db: AsyncSession = Depends(get_db)):
     db_statement = await statement_controller.get_statement(db, statement_id)
     if db_statement is None:

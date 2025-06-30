@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from finances_shared.models.statement import Statements
+from finances_shared.models import Statements
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -11,21 +11,22 @@ import finances_statements.services.accounts as accounts_service
 from finances_statements.logger import logger
 from finances_statements.schemas import (
     StatementCreate,
+    StatementExtended,
     StatementFilters,
     StatementUpdate,
-    StatementWithAccounts,
 )
 
 
 async def get_statement(
     db: AsyncSession, statement_id: UUID
-) -> Optional[StatementWithAccounts]:
+) -> Optional[StatementExtended]:
     result = await db.execute(
         select(Statements)
         .where(Statements.id == statement_id)
         .options(
             joinedload(Statements.source_account),
             joinedload(Statements.destination_account),
+            selectinload(Statements.tags),
         )
     )
 
@@ -34,7 +35,7 @@ async def get_statement(
     if not statement:
         return None
 
-    statement = StatementWithAccounts.model_validate(statement)
+    statement = StatementExtended.model_validate(statement)
     return statement
 
 

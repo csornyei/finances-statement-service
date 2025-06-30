@@ -40,9 +40,19 @@ class StatementAccount(BaseModel):
         from_attributes = True
 
 
-class StatementWithAccounts(StatementOut):
+class StatementTag(BaseModel):
+    id: UUID
+    name: str
+    color: str
+
+    class Config:
+        from_attributes = True
+
+
+class StatementExtended(StatementOut):
     source_account: Optional[StatementAccount] = None
     destination_account: Optional[StatementAccount] = None
+    tags: Optional[list[StatementTag]] = None
 
     class Config:
         from_attributes = True
