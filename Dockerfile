@@ -19,6 +19,6 @@ ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /app
-COPY src/tag_service ./tag_service
+COPY src/finances_statements ./finances_statements
 
 ENTRYPOINT ["fastapi", "run", "finances_statements/main.py"]
