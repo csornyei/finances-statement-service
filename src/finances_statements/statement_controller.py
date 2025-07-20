@@ -61,6 +61,7 @@ async def get_statements(
     query = query.options(
         selectinload(Statements.source_account),
         selectinload(Statements.destination_account),
+        selectinload(Statements.tags),
     )
 
     query = query.offset(filters.skip).limit(filters.limit)
