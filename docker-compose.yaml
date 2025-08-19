@@ -49,7 +49,7 @@ services:
     entrypoint: ["python", "-m", "finances_statements.listener"]
 
 networks:
-  finances-network:
+  finances_shared_default:
     external: true
 
 secrets:
